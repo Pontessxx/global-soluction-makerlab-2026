@@ -19,7 +19,7 @@ Robô de ronda que percorre um trecho de rua à noite, mede a iluminação com u
 |---|---|
 | Simulação no Wokwi | [wokwi.com/projects/480126908613575681](https://wokwi.com/projects/480126908613575681) |
 | Vídeo demonstrativo (até 6 min) | [youtu.be/dMcLCSL_VKg](https://youtu.be/dMcLCSL_VKg) |
-| Repositório do produto Rua Acesa | _colar o link_ |
+| Repositório do produto Rua Acesa | [link-do-repo](https://github.com/Pontessxx/global-soluction-makerlab-2026)_ |
 
 ---
 
