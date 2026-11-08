@@ -19,7 +19,7 @@ Robô de ronda que percorre um trecho de rua à noite, mede a iluminação com u
 |---|---|
 | Simulação no Wokwi | [wokwi.com/projects/480126908613575681](https://wokwi.com/projects/480126908613575681) |
 | Vídeo demonstrativo (até 6 min) | [youtu.be/dMcLCSL_VKg](https://youtu.be/dMcLCSL_VKg) |
-| Repositório do produto Rua Acesa | [link-do-repo](https://github.com/Pontessxx/global-soluction-makerlab-2026)_ |
+| Repositório da Maker Lab (este) | [github.com/Pontessxx/global-soluction-makerlab-2026](https://github.com/Pontessxx/global-soluction-makerlab-2026/) |
 
 ---
 
@@ -137,23 +137,25 @@ g++ -std=c++17 -I wokwi ml/tests/host_test.cpp -o /tmp/host_test
 /tmp/host_test ml/tests/parity_vectors.txt   # confere C++ == Python
 ```
 
-## 7. Plano de testes (preencher a coluna *Resultado* durante a demonstração)
+## 7. Plano de testes
 
-| # | Condição | Como provocar | Resultado esperado | Resultado |
+> **Como ler a coluna *Resultado*:** foi preenchida por **análise do código** do `sketch.ino` (laço `loop()`, `postJson()`, `enqueue()` e `flushQueue()`), isto é, descreve o que o programa faz em cada condição. **Não é uma gravação de execução.** Cada linha foi pensada para ser conferida no Serial Monitor do Wokwi, e o texto entre crases é a mensagem que o código imprime.
+
+| # | Condição | Como provocar | Resultado esperado | Resultado (análise do código) |
 |---|---|---|---|---|
-| 1 | Rua bem iluminada | `FONTE_LUZ 1` (ou slider alto) | LED verde, classe `ADEQUADO`, nenhum POST | |
-| 2 | Iluminação fraca | `FONTE_LUZ 2` | LED amarelo; após 3 janelas, LED vermelho por 3 s, 3 bips, POST com `FRACO` | |
-| 3 | Ponto escuro | `FONTE_LUZ 3` | Idem, POST com `ESCURO` | |
-| 4 | Luminária piscando | `FONTE_LUZ 4` | POST com `INSTAVEL` | |
-| 5 | Sombra passageira (anti falso alarme) | Slider baixo por < 3 janelas (~9 s) e volta | Amarelo, **sem POST** | |
-| 6 | Obstáculo | HC-SR04 < 25 cm com luz escura | 2 bips, LED amarelo, leitura suspensa, **sem POST**; ao liberar, retoma | |
-| 7 | Mesma ocorrência persistente | Manter `ESCURO` por mais de 15 s | `cooldown`: segundo POST só após 15 s | |
-| 8 | Mudança de classe | Slider de FRACO para ESCURO | Novo POST na hora (cooldown vale só para a mesma classe) | |
-| 9 | Umidade alta | Umidade do DHT22 ≥ 85% | POST com `"contexto":"umidade_alta"` | |
-| 10 | **Falha:** API fora do ar | `API_URL` inválida (ou resposta 500 no webhook.site) | `[api] falha — guardando na fila`; a ronda continua | |
-| 11 | **Falha:** Wi-Fi indisponível | Mudar `WIFI_SSID` | Inicia em modo offline; fila cresce | |
-| 12 | **Falha:** API volta | Voltar o webhook.site para 200 e a luz para `ADEQUADO` | Fila é reenviada (`[fila] reenviada`) | |
-| 13 | **Falha:** DHT sem leitura | Sensor sem resposta | Log `[dht] leitura inválida`; ronda segue; JSON com `null` | |
+| 1 | Rua bem iluminada | `FONTE_LUZ 1` (ou slider alto) | LED verde, classe `ADEQUADO`, nenhum POST | Janela classificada como `ADEQUADO`: `badStreak` volta a 0, o LED fica verde e nenhuma ocorrência é criada. O código só chama `flushQueue()` |
+| 2 | Iluminação fraca | `FONTE_LUZ 2` | LED amarelo; após 3 janelas, LED vermelho por 3 s, 3 bips, POST com `FRACO` | Cada janela ruim soma 1 em `badStreak` e mantém o LED amarelo. Na 3ª (`CONFIRM_WINDOWS`) imprime `[ocorrencia] CONFIRMADA`, acende o vermelho, toca 3 bips e chama `postJson()` |
+| 3 | Ponto escuro | `FONTE_LUZ 3` | Idem, POST com `ESCURO` | Mesmo fluxo do teste 2, com `"classe":"ESCURO"` no JSON |
+| 4 | Luminária piscando | `FONTE_LUZ 4` | POST com `INSTAVEL` | A janela tem variação alta (`cv`), a árvore a classifica como `INSTAVEL` e, após 3 janelas, o relato sai com essa classe |
+| 5 | Sombra passageira (anti falso alarme) | Slider baixo por < 3 janelas (~9 s) e volta | Amarelo, **sem POST** | `badStreak` chega a 1 ou 2, depois uma janela `ADEQUADO` zera a contagem. Como `badStreak` nunca chega a 3, o código não cria ocorrência |
+| 6 | Obstáculo | HC-SR04 < 25 cm com luz escura | 2 bips, LED amarelo, leitura suspensa, **sem POST**; ao liberar, retoma | Com distância abaixo de `OBSTACLE_CM` (25), imprime `[obstaculo] ... leitura de luz suspensa`, toca 2 bips, zera a janela e `badStreak`, e o `loop()` retorna antes de ler o LDR. Ao liberar, imprime `[obstaculo] caminho livre — retomando leituras` |
+| 7 | Mesma ocorrência persistente | Manter `ESCURO` por mais de 15 s | `cooldown`: segundo POST só após 15 s | Para a mesma classe dentro de `REPORT_COOLDOWN_MS` (15 s), imprime `[ocorrencia] já reportada há pouco — ignorando (cooldown)` e não envia. Como `badStreak` é zerado, um novo relato exige mais 3 janelas e só sai depois dos 15 s |
+| 8 | Mudança de classe | Slider de FRACO para ESCURO | Novo POST na hora (cooldown vale só para a mesma classe) | O teste de cooldown exige `cls == lastReportClass`. Com classe diferente ele não bloqueia, então o relato sai assim que 3 janelas ruins se completam |
+| 9 | Umidade alta | Umidade do DHT22 ≥ 85% | POST com `"contexto":"umidade_alta"` | `buildPayload()` usa `UMIDADE_ALTA_PCT` (85): com `umidPct >= 85` o campo `contexto` vai como `umidade_alta`; abaixo disso, `normal` |
+| 10 | **Falha:** API fora do ar | `API_URL` inválida (ou resposta 500 no webhook.site) | `[api] falha — guardando na fila`; a ronda continua | `postJson()` retorna `false` quando o código HTTP não é 2xx (ou sem rede). O código imprime `[api] falha — guardando na fila`, chama `enqueue()` (`[fila] N pendente(s)`) e o `loop()` segue lendo |
+| 11 | **Falha:** Wi-Fi indisponível | Mudar `WIFI_SSID` | Inicia em modo offline; fila cresce | `connectWifi()` desiste em 10 s e imprime `FALHOU (modo offline: ocorrências ficam na fila)`. `postJson()` devolve `false` de imediato, então cada ocorrência vai para a fila (até 8; a mais antiga é descartada com aviso). O `loop()` tenta `WiFi.reconnect()` a cada 10 s |
+| 12 | **Falha:** API volta | Voltar o webhook.site para 200 e a luz para `ADEQUADO` | Fila é reenviada (`[fila] reenviada`) | `flushQueue()` é chamada a cada janela `ADEQUADO`: reenvia na ordem e imprime `[fila] reenviada, restam N` até esvaziar. Se ainda houver falha, para e tenta na janela seguinte. O JSON reenviado mantém o mesmo `event_id` |
+| 13 | **Falha:** DHT sem leitura | Sensor sem resposta | Log `[dht] leitura inválida`; ronda segue; JSON com `null` | `lerDht()` imprime `[dht] leitura inválida (etapa: ...) — mantendo a anterior` e conserva o último valor válido. Se nunca houve leitura válida, o JSON leva `null` em `temperatura_c` e `umidade_pct`. A ronda não para |
 
 ## 8. Segurança e LGPD
 
