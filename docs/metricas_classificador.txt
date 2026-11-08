@@ -1,0 +1,20 @@
+MÉTRICAS DO CLASSIFICADOR (dados SINTÉTICOS — veja ressalva no script)
+Janela=10 leituras | treino=9000 | teste=3000 | nós da árvore=23
+Limiares de projeto: escuro<5.0 lux, adequado>=20.0 lux
+
+              precision    recall  f1-score   support
+
+    ADEQUADO      0.995     0.991     0.993       750
+       FRACO      0.981     0.985     0.983       750
+      ESCURO      0.993     0.991     0.992       750
+    INSTAVEL      0.997     1.000     0.999       750
+
+    accuracy                          0.992      3000
+   macro avg      0.992     0.992     0.992      3000
+weighted avg      0.992     0.992     0.992      3000
+
+Matriz de confusão (linhas=real, colunas=previsto; ordem: ADEQUADO, FRACO, ESCURO, INSTAVEL)
+[[743   7   0   0]
+ [  4 739   5   2]
+ [  0   7 743   0]
+ [  0   0   0 750]]

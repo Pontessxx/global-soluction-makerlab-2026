@@ -1,0 +1,329 @@
+{
+  "version": 1,
+  "author": "Rua Acesa — Robô de ronda (protoboard, sem motores, com DHT22)",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 20,
+      "left": -250,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-breadboard-half",
+      "id": "bb1",
+      "top": 120,
+      "left": -20,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-photoresistor-sensor",
+      "id": "ldr",
+      "top": -140,
+      "left": 30,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-hc-sr04",
+      "id": "us",
+      "top": -150,
+      "left": 200,
+      "attrs": {
+        "distance": "200"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz",
+      "top": 330,
+      "left": 170,
+      "attrs": {
+        "volume": "0.1"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledG",
+      "top": 330,
+      "left": 250,
+      "attrs": {
+        "color": "green",
+        "label": "OK"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rG",
+      "top": 318,
+      "left": 320,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledY",
+      "top": 375,
+      "left": 250,
+      "attrs": {
+        "color": "yellow",
+        "label": "ATENCAO"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rY",
+      "top": 363,
+      "left": 320,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledR",
+      "top": 420,
+      "left": 250,
+      "attrs": {
+        "color": "red",
+        "label": "OCORRENCIA"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rR",
+      "top": 408,
+      "left": 320,
+      "rotate": 90,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+      "type": "wokwi-dht22",
+      "id": "dht",
+      "top": -150,
+      "left": 340,
+      "attrs": {
+        "temperature": "24",
+        "humidity": "60"
+      }
+    }
+  ],
+  "connections": [
+    [
+      "esp:TX0",
+      "$serialMonitor:RX",
+      "",
+      []
+    ],
+    [
+      "esp:RX0",
+      "$serialMonitor:TX",
+      "",
+      []
+    ],
+    [
+      "esp:3V3",
+      "bb1:tp.1",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "bb1:tn.1",
+      "black",
+      []
+    ],
+    [
+      "esp:VIN",
+      "bb1:bp.1",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.2",
+      "bb1:bn.1",
+      "black",
+      []
+    ],
+    [
+      "ldr:VCC",
+      "bb1:tp.4",
+      "red",
+      []
+    ],
+    [
+      "ldr:GND",
+      "bb1:tn.4",
+      "black",
+      []
+    ],
+    [
+      "esp:D34",
+      "bb1:3t.a",
+      "orange",
+      []
+    ],
+    [
+      "ldr:AO",
+      "bb1:3t.b",
+      "orange",
+      []
+    ],
+    [
+      "us:VCC",
+      "bb1:bp.8",
+      "red",
+      []
+    ],
+    [
+      "us:GND",
+      "bb1:bn.8",
+      "black",
+      []
+    ],
+    [
+      "esp:D19",
+      "bb1:6t.a",
+      "green",
+      []
+    ],
+    [
+      "us:TRIG",
+      "bb1:6t.b",
+      "green",
+      []
+    ],
+    [
+      "esp:D18",
+      "bb1:7t.a",
+      "blue",
+      []
+    ],
+    [
+      "us:ECHO",
+      "bb1:7t.b",
+      "blue",
+      []
+    ],
+    [
+      "esp:D23",
+      "bb1:19t.a",
+      "purple",
+      []
+    ],
+    [
+      "bz:2",
+      "bb1:19t.b",
+      "purple",
+      []
+    ],
+    [
+      "bz:1",
+      "bb1:tn.20",
+      "black",
+      []
+    ],
+    [
+      "esp:D25",
+      "bb1:15t.a",
+      "green",
+      []
+    ],
+    [
+      "bb1:15t.b",
+      "rG:1",
+      "gray",
+      []
+    ],
+    [
+      "rG:2",
+      "ledG:A",
+      "gray",
+      []
+    ],
+    [
+      "ledG:C",
+      "bb1:bn.25",
+      "black",
+      []
+    ],
+    [
+      "esp:D26",
+      "bb1:16t.a",
+      "gold",
+      []
+    ],
+    [
+      "bb1:16t.b",
+      "rY:1",
+      "gray",
+      []
+    ],
+    [
+      "rY:2",
+      "ledY:A",
+      "gray",
+      []
+    ],
+    [
+      "ledY:C",
+      "bb1:bn.16",
+      "black",
+      []
+    ],
+    [
+      "esp:D27",
+      "bb1:17t.a",
+      "red",
+      []
+    ],
+    [
+      "bb1:17t.b",
+      "rR:1",
+      "gray",
+      []
+    ],
+    [
+      "rR:2",
+      "ledR:A",
+      "gray",
+      []
+    ],
+    [
+      "ledR:C",
+      "bb1:bn.17",
+      "black",
+      []
+    ],
+    [
+      "dht:VCC",
+      "bb1:tp.10",
+      "red",
+      []
+    ],
+    [
+      "dht:GND",
+      "bb1:tn.10",
+      "black",
+      []
+    ],
+    [
+      "esp:D32",
+      "bb1:10t.a",
+      "magenta",
+      []
+    ],
+    [
+      "dht:SDA",
+      "bb1:10t.b",
+      "magenta",
+      []
+    ]
+  ],
+  "dependencies": {}
+}
